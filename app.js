@@ -1,22 +1,83 @@
+var isNewGame;
 // Тоглогчийн ээлжийг хадгалах хувьсагч.
-var activePlayer = 1;
+var activePlayer;
 
 // Тоглогчийн цуглуулсан оноог хадгалах хувьсагч
-var scores = [0, 0];
+var scores;
 
 // Тухайн хугацааны буултыг хадгалах хувьсагч
-var roundScore = 0;
+var roundScore;
+var diceDom = document.querySelector(".dice");
+initGame();
+function initGame() {
+  isNewGame = true;
+  activePlayer = 0;
+  scores = [0, 0];
+  roundScore = 0;
+  document.getElementById("score-0").textContent = "0";
+  document.getElementById("score-1").textContent = "0";
+  document.getElementById("current-0").textContent = "0";
+  document.getElementById("current-1").textContent = "0";
 
-// Ð¨Ð¾Ð¾Ð½Ñ‹ Ð°Ð»ÑŒ Ñ‚Ð°Ð»Ð°Ð°Ñ€Ð°Ð° Ð±ÑƒÑƒÑÐ½Ñ‹Ð³ Ñ…Ð°Ð´Ð³Ð°Ð»Ð°Ñ… Ñ…ÑƒÐ²ÑŒÑÐ°Ð³Ñ‡ Ñ…ÑÑ€ÑÐ³Ñ‚ÑÐ¹, 1-6 Ð³ÑÑÑÐ½ ÑƒÑ‚Ð³Ñ‹Ð³ ÑÐ½Ñ Ñ…ÑƒÐ²ÑŒÑÐ°Ð³Ñ‡Ð¸Ð´ ÑÐ°Ð½Ð°Ð¼ÑÐ°Ñ€Ð³Ò¯Ð¹Ð³ÑÑÑ€ Ò¯Ò¯ÑÐ³ÑÐ¶ Ó©Ð³Ð½Ó©.
-var dice = Math.floor(Math.random() * 6) + 1;
+  document.getElementById("name-0").textContent = "Тоглогч 1";
+  document.getElementById("name-1").textContent = "Тоглогч 2";
 
-// ÐŸÑ€Ð¾Ð³Ñ€Ð°Ð¼ ÑÑ…Ð»ÑÑ…ÑÐ´ Ð±ÑÐ»Ñ‚Ð³ÑÐµ
-document.querySelector("#score-0").textContent = 0;
-document.querySelector("#score-1").textContent = 0;
+  document.querySelector(".player-0-panel").classList.remove("winner");
+  document.querySelector(".player-1-panel").classList.remove("winner");
 
-document.querySelector("#current-0").textContent = 0;
-document.querySelector("#current-1").textContent = 0;
+  document.querySelector(".player-0-panel").classList.remove("active");
+  document.querySelector(".player-1-panel").classList.remove("active");
 
-document.querySelector(".dice").style.display = "none";
+  document.querySelector(".player-0-panel").classList.add("active");
 
-console.log("Шоо :" + dice);
+  diceDom.style.display = "none";
+}
+document.querySelector(".btn-roll").addEventListener("click", function () {
+  if (isNewGame) {
+    var diceNumber = Math.floor(Math.random() * 6) + 1;
+    diceDom.style.display = "block";
+    diceDom.src = "dice-" + diceNumber + ".png";
+
+    if (diceNumber !== 1) {
+      roundScore = roundScore + diceNumber;
+      document.getElementById(
+        "current-" + activePlayer
+      ).textContent = roundScore;
+    } else {
+      switchToNextPlayer();
+    }
+  } else {
+    alert("Тоглоом дууслаа. Эхлэх товч дээр дарж шинээр эхлүүлнэ үү !");
+  }
+});
+
+document.querySelector(".btn-hold").addEventListener("click", function () {
+  if (isNewGame) {
+    scores[activePlayer] = scores[activePlayer] + roundScore;
+    document.getElementById("score-" + activePlayer).textContent =
+      scores[activePlayer];
+    if (scores[activePlayer] >= 10) {
+      isNewGame = false;
+      document.getElementById("name-" + activePlayer).textContent = "WINNER!!!";
+      document
+        .querySelector(".player-" + activePlayer + "-panel")
+        .classList.add("winner");
+      document
+        .querySelector(".player-" + activePlayer + "-panel")
+        .classList.remove("active");
+    } else {
+      switchToNextPlayer();
+    }
+  } else {
+    alert("Тоглоом дууслаа. Эхлэх товч дээр дарж шинээр эхлүүлнэ үү !");
+  }
+});
+function switchToNextPlayer() {
+  roundScore = 0;
+  document.getElementById("current-" + activePlayer).textContent = 0;
+  activePlayer === 0 ? (activePlayer = 1) : (activePlayer = 0);
+  document.querySelector(".player-0-panel").classList.toggle("active");
+  document.querySelector(".player-1-panel").classList.toggle("active");
+  diceDom.style.display = "none";
+}
+document.querySelector(".btn-new").addEventListener("click", initGame);
